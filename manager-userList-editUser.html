@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Required meta tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="statics/scss/all.css">
+
+<!-- ajax -->
+<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+
+<title>復活Pro</title>
+</head>
+
+<body>
+    <!-- navBar_manager -->
+    <nav class="navbar navbar-expand-lg bg-secondary px-5 d-flex justify-content-start">
+        <div class="container-fluid">
+            <a class="navbar-brand">
+                <img src="statics/img/logo.png" alt="logo.png" height="24">
+            </a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="manager-userList.html">會員清單</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="manager-managerList.html">管理者清單</a>
+                </li>
+            </ul>
+            <div class="navBar nav">
+                管理者中心
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- main_view -->
+    <div id="main_view" class="containter py-5 px-5 main_view">
+    	<div id="edit_form"></div>
+    	<div class="submit d-flex justify-content-center mb-5">
+	   		<button onclick="submitEdit()" class="btn-cool">修改會員資料</button>
+		</div>
+    </div>
+
+<script>
+	   
+	//取user_id
+	var url_string = window.location.href;
+	var url = new URL(url_string);
+	var user_id = url.searchParams.get("user_id");
+	
+	console.log(user_id);
+	
+	//var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+	
+	
+	// 處理表單點擊事件
+	var $edit_form = $('#submitButton');
+	$edit_form.click(function () {
+	    submitEdit();
+	});
+
+	// 處理編輯會員事件
+	function submitEdit() {
+		
+		// 將前端表單填寫值存進變數
+		var user_name = $('#input_user_name').val();
+		var stu_id = $('#input_student_id').val();
+		var email = $('#input_email').val();
+		var password = $('#input_password').val();
+		var user_phone = $('#input_phone_number').val();
+
+		var data_object = {
+			"user_id" : user_id,
+			"user_name" : user_name,
+			"stu_id" : stu_id,
+			"email" : email,
+			"password" : password,
+			"user_phone" : user_phone
+		};
+		
+		console.log(user_id);
+		
+		// 將JSON格式轉換成字串
+		var data_string = JSON.stringify(data_object);
+		
+		// 發出POST的AJAX請求
+		$.ajax({
+			type : "PUT",
+			url : "api/member.do",
+			data : data_string,
+			crossDomain : true,
+			cache : false,
+			dataType : 'json',
+			timeout : 5000,
+			success : function(response) {
+				if (response.status == 200) {	
+					alert("會員修改成功");
+				} else if (response.status == 400) {
+					alert("會元修改失敗");
+				}
+			},
+			error : function() {
+				alert("無法連線到伺服器");
+			}
+		});
+	}
+		
+	function getUserInfo(user_id) {
+		
+		// 發出POST的GET請求取得所有會員列表
+		$.ajax({
+			type : "GET",
+			url : "api/member.do",
+			crossDomain : true,
+			data : "user_id=" + user_id,
+			cache : false,
+			dataType : 'json',
+			timeout : 5000,
+			success : function(response) {
+				//假設取得成功，更新前端表格
+				if (response.status == 200) {
+					updateInfo(response.response.data);
+				}
+				console.log(response);
+			},
+			error : function() {
+				alert("無法連線到伺服器!!!");
+			}
+		});
+	}
+	 
+	// 更新會員列表表格
+	function updateInfo(data) {
+		// 清空前端main_view
+		$("#edit_form").empty();
+	
+		var info_html = '';
+	
+		$.each(data, function(index, value) {
+
+			info_html += '<div class="containter py-5 px-5 main_view">';
+
+			info_html += '<div class="container container-fluid mt-5">';
+			info_html += '<div class="d-flex justify-content-between px-5 mb-3">';
+			info_html += '<div class="myTitle-main">修改會員資訊 編號:' + value['user_id'] + '</div>';
+			info_html += '<a href="manager-userList.html" class="btn btn-outline-primary">返回會員清單</a>';
+			info_html += '</div>';
+			info_html += '<form id="edit_form" accept-charset="utf-8" class="needs-validation">';
+
+			info_html += '<div style="display:none;"><input type="hidden" name="_method" value="PUT"></div>';
+
+			info_html += '<div class="px-5 mb-3">';
+			info_html += '<label for="input_student_id" class="form-label">學號</label>';
+			info_html += '<input class="form-control" name="number" type="number" id="input_student_id" placeholder="' + value['stu_id'] + '" value="' + value['stu_id'] + '" disabled readonly>';
+			info_html += '</div>';
+			info_html += '<div class="px-5 mb-3">';
+			info_html += ' <label for="input_user_name" class="form-label">姓名</label>';
+			info_html += '<input class="form-control" name="user_name" type="text" id="input_user_name" placeholder="' + value['user_name'] + '" value="' + value['user_name'] + '">';
+			info_html += '</div>';
+			info_html += '<div class="px-5 mb-3">';
+			info_html += '<label for="input_email" class="form-label">Email</label>';
+			info_html += '<input class="form-control" name="email" type="email" id="input_email" placeholder="' + value['email'] + '"value="' + value['email'] + '">';
+			info_html += '</div>';
+			info_html += '<div class="px-5 mb-3">';
+			info_html += '<label for="input_password" class="form-label">密碼</label>';
+			info_html += '<input class="form-control" name="password" type="password" id="input_password" placeholder="' + value['password'] + '" value="' + value['password'] + '">';
+			info_html += '</div>';
+			info_html += '<div class="px-5 mb-3">';
+			info_html += '<label for="input_phone_number" class="form-label">手機號碼</label>';
+			info_html += '<input class="form-control" name="phone_number" type="number" id="input_phone_number" placeholder="' + value['user_phone'] + '" value="' + value['user_phone'] + '">';
+			info_html += '</div></form></div></div>';
+		})
+		// 重新append所有會員row
+		$("#edit_form").append(info_html);
+	}
+	
+	
+	
+	//渲染時執行getAllMember()
+	$(document).ready(function () {
+		//sessionStorage.setItem("user_id", "6");
+	    getUserInfo(user_id);
+	});
+
+</script>
+
+
+
+
+    <footer>
+        <div class="bg-white shadow" style="height: 200px;">
+            <div class="container main_view">
+                <div class="d-flex justify-content-between py-5 px-5">
+                    <div>
+                        <img src="asset/img/logo.png" alt="logo.png">
+                        <h5 class="text-secondary mt-2">SA Final Project</h5>
+                        <a href="login.html">返回首頁</i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

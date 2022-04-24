@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Required meta tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="statics/scss/all.css">
+
+<!-- ajax -->
+<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+
+<title>復活Pro</title>
+</head>
+
+<body>	
+	<!-- navBar_visitor -->
+    <nav class="navbar navbar-expand-lg bg-secondary px-5 d-flex justify-content-start">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html" data-bs-toggle="modal" data-bs-target="#input_dialog">
+                <img src="statics/img/logo.png" alt="logo.png" height="24">
+            </a>
+	        <ul class="navbar-nav">
+	            <form class="mx-3" action="register.html">
+	                <button type="link" class="btn btn-outline-primary">註冊</button>
+	            </form>
+	            <form action="login.html">
+	                <button type="link" class="btn btn-outline-primary">登入</button>
+	            </form>
+	        </ul>
+        </div>
+    </nav>
+
+    <!-- 彈跳式視窗 -->
+    <div class="modal fade" id="input_dialog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <center class="py-3">
+                        <img src="statics/asset/img/info.svg" alt="success.svg">
+                        <h5 class="mt-4">請先登入</h5>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- main_view -->
+	<div class="containter py-5 px-5 main_view form-sm">
+		<!-- 登入表單form -->
+		<form id="form" accept-charset="utf-8">
+			<div class="d-flex justify-content-between py-5 px-5">
+				<div class="myTitle-main">會員登入</div>
+			</div>
+			<div class="px-5 mb-3">
+				<label for="input_student_id" class="form-label">學號</label> <input
+					class="form-control" name="id" type="text" id="input_student_id"
+					placeholder="學號" required="required">
+			</div>
+			<div class="px-5 mb-3">
+				<label for="input_password" class="form-label">密碼</label> <input
+					class="form-control" name="password" type="password"
+					id="input_password" placeholder="密碼" required="required">
+			</div>
+
+			<div class="submit d-flex justify-content-center mt-5">
+				<input class="btn-cool" type="submit" value="登入" id="submit">
+			</div>
+		</form>
+	</div>
+
+	<script>
+		$(document).ready(function()
+		{
+			// 處理表單點擊事件
+			var $form = $('#submit');
+			$form.click(function() {
+				submit();
+			});
+
+			function submit() {
+				var stu_id = $('#input_student_id').val();
+				var password = $('#input_password').val();
+
+				var data_object = {
+					"user_name" : "",
+					"stu_id" : stu_id,
+					"email" : "",
+					"password" : password,
+					"user_phone" : ""
+				};
+
+				// 將JSON格式轉換成字串
+				var data_string = JSON.stringify(data_object);
+
+				// 發出POST的AJAX請求
+				$.ajax({
+					type : "POST",
+					url : "api/member.do",
+					data : data_string,
+					crossDomain : true,
+					cache : false,
+					dataType : 'json',
+					timeout : 5000,
+					success : function(response) {
+						if (response.status == 200) {
+							if (response['response']['data'] == "") {				
+								alert("此學號不存在");							
+							} else {
+								var correct_password = response['response']['data'][0]['password'];
+								var user_id = response['response']['data'][0]['user_id'];
+								if (password == correct_password) {
+									alert("會員登入成功");
+									sessionStorage.setItem("user_id",JSON.stringify(user_id)); //登入將user_id存入
+									document.location.href = "index.html";
+								} else {
+									alert("登入失敗！請重新檢查你的密碼是否輸入正確");
+								}
+							}
+						} else if (response.status == 400) {
+							alert("登入失敗！");
+						}
+
+					},
+					error : function() {
+						alert("無法連線到伺服器！");
+					}
+				});
+			  }
+		});
+		
+					
+	</script>
+
+	<!-- footer -->
+	<script src="statics/js/meta_content/footer_user.js"></script>
+
+
+
+
+	<!-- Optional JavaScript; choose one of the two! -->
+
+	<!-- Option 1: Bootstrap Bundle with Popper -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

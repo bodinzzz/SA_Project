@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Required meta tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="statics/scss/all.css">
+
+<!-- ajax -->
+<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+
+<title>復活Pro</title>
+</head>
+
+<body>
+	<!-- navBar -->
+	<script src="statics/js/meta_content/navBar_user.js"></script>
+
+	<!-- tabBar -->
+	<div class="bg-tabBar py-5">
+		<div class="d-flex justify-content-center mb-3 px-5">
+			<div class="row">
+				<div class="col">
+					<form action="center-basicInfo-view.html">
+						<button type="submit" class="btn-tabBar">基本資料</button>
+					</form>
+				</div>
+				<div class="col">
+					<form action="center-myOrder-browse.html">
+						<button type="submit" class="btn-tabBar btn-tabBar-hover">我的訂單</button>
+					</form>
+				</div>
+				<div class="col">
+					<form action="center-product-browse.html">
+						<button type="submit" class="btn-tabBar">商品管理</button>
+					</form>
+				</div>
+				<div class="col">
+					<form action="login.html">
+						<button type="submit" class="btn-tabBar">登出</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="containter py-5 px-5 main_view">
+		<!-- 標題 -->
+		<div class="d-flex justify-content-between mb-3 px-5">
+			<div class="myTitle-main">我的訂單列表</div>
+		</div>
+
+		<!-- 商品列表 -->
+		<div class="container container-fluid px-5 mt-3">
+			<table id="order_list_table" class="table table-hover">
+				<thead>
+					<tr>
+						<th scope="col">訂單編號</th>
+						<th scope="col">訂單狀態</th>
+						<th scope="col">商品名稱</th>
+						<th scope="col">建立時間</th>
+						<th scope="col">與賣家聯絡</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+			<div id="exampleModal" class="modal fade" tabindex="-1">
+		  <div class="modal-dialog modal-dialog-scrollable">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title">聊天室</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		      </div>
+		      <div class="modal-body">
+                <div class="container overflow-auto px-3 py-3">
+                    <div class="d-flex flex-row-reverse">
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header text-end">Buyer</div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    您好，我剛把商品加入訂單!希望您確認一下!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">Seller</div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    我已經確認了喔~
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row-reverse">
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header text-end">Buyer</div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    請問方便約看嗎?s
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">Seller</div>
+                            <div class="card-body">
+                                    可以喔~明天的下午5:00在後門方便嗎?
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row-reverse">
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header text-end">Buyer</div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    沒問題!謝謝您~
+                                </p>
+                            </div>
+                        </div>
+                    </div>            
+                </div>
+		      </div>
+		      <div class="modal-footer">
+                <form id="form" accept-charset="utf-8">
+                    <div class="input-group mt-3">
+                        <input class="form-control form-control-lg" name="message" type="text" id="input_message"
+                            placeholder="請輸入訊息" required>
+                        <input class="btn btn-primary" type="submit" value="送出" id="submit">
+                    </div>
+                </form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	
+	<script>
+	
+		var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+   		let user_id_string = user_id.toString();
+	
+		function getOrderByBuyerID() {
+			
+			// 發出POST的GET請求取得所有會員列表
+			$.ajax({
+				type : "GET",
+				url : "api/order.do",
+				crossDomain : true,
+				data : "buyer_id=" + user_id_string,
+				cache : false,
+				dataType : 'json',
+				timeout : 5000,
+				success : function(response) {
+					//假設取得成功，更新前端表格
+					if (response.status == 200) {
+						updateTable(response.response.data);
+					}
+				},
+				error : function() {
+					alert("無法連線到伺服器!!!");
+				}
+			});
+		}
+		
+		
+		// 更新會員列表表格
+		function updateTable(data) {
+			// 清空前端表格rows
+			
+			$("#order_list_table > tbody").empty();
+
+			var table_html = '';
+
+			$.each(data, function(index, value) {
+				
+				table_html += '<tr>';
+				table_html += '<th scope="row">' + value['order_id'] + '</th>';
+				table_html += '<td>' + value['order_status'] + '</td>';
+				table_html += '<td>' + value['product_name'] + '</td>';
+				table_html += '<td>' + value['created'] + '</td>';
+				table_html += '<td><button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">聊天室</button></td>';
+				table_html += '</tr>';
+				
+			    })
+
+			// 重新append所有會員row
+			$("#order_list_table > tbody").append(table_html);
+		 }
+		
+		
+		
+		//渲染時執行getProductByUserID()
+		$(document).ready(function() {
+			getOrderByBuyerID();
+		});
+	</script>
+
+
+
+
+	<!-- Optional JavaScript; choose one of the two! -->
+
+	<!-- Option 1: Bootstrap Bundle with Popper -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Required meta tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="statics/scss/all.css">
+
+<!-- ajax -->
+<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+
+<title>復活Pro</title>
+</head>
+
+<body>
+	<!-- navBar -->
+	<script src="statics/js/meta_content/navBar_user.js"></script>
+	
+	<!-- main_view:productInfo -->
+
+    <div class="containter mt-5 px-5 main_view" id="main_view">
+    </div>
+    
+	 <div class="d-flex justify-content-center">
+		<button onclick="newOrder()" type="button" class="btn-cool" data-bs-toggle="modal" data-bs-target="#input_dialog">我要購買</button>
+	</div>
+    
+ 
+ 
+    <script>
+    
+		//取product_id
+		var url_string = window.location.href;
+		var url = new URL(url_string);
+		var product_id = url.searchParams.get("product_id");
+		
+    
+		// 取登入會員編號
+   		var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+   		let user_id_string = user_id.toString();
+		
+		
+		function getProductInfo(product_id) {
+			
+			// 發出POST的GET請求取得所有會員列表
+			$.ajax({
+				type : "GET",
+				url : "api/product.do",
+				crossDomain : true,
+				data : "product_id=" + product_id,
+				cache : false,
+				dataType : 'json',
+				timeout : 5000,
+				success : function(response) {
+					//假設取得成功，更新前端表格
+					if (response.status == 200) {
+						console.log("有跑來這裡喔喔喔");
+						console.log(response.response.data);
+						updateInfo(response.response.data);
+					}
+				},
+				error : function() {
+					alert("無法連線到伺服器!!!");
+				}
+			});
+		}
+		
+		 //更新商品資訊表格
+		function updateInfo(data) {
+			$("#main_view").empty();
+		
+			var productInfo_html = '';
+		
+			$.each(data, function(index, value) {
+				
+				productInfo_html += '<div class="d-flex justify-content-center px-5">';
+				productInfo_html += '<div class="myTitle-main">商品資訊</div>';
+				productInfo_html += '<button class="btn btn-outline-primary"><i class="bi bi-bookmark-heart"></i>收藏</button>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-center py-5 px-5">';
+				productInfo_html += '<div>';
+				productInfo_html += '<div class="div-productInfo">';
+				productInfo_html += '<img src="statics/asset/img/textbook1.png" class="product-img" alt="商品圖片">';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-start py-5 px-5">';
+				productInfo_html += '<div class="myTitle-info">等待購買人數</div>';
+				productInfo_html += '<div class="myText-info">' + value['num_of_wait'] + '人</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div>';
+				productInfo_html += '<div class="d-flex justify-content-start mb-3 px-5">';
+				productInfo_html += '<div class="myTitle-info">商品編號</div>';
+				productInfo_html += '<div class="myText-info">' + value['product_id'] + '</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-start mb-3 px-5">';
+				productInfo_html += '<div class="myTitle-info">商品類別</div>';
+				productInfo_html += '<div class="myText-info">' + value['product_type'] + '</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-start mb-3 px-5">';
+				productInfo_html += '<div class="myTitle-info">商品狀態</div>';
+				productInfo_html += '<div class="myText-info">' + value['product_state'] + '</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-start mb-3 px-5">';
+				productInfo_html += '<div class="myTitle-info">商品價格</div>';
+				productInfo_html += '<div class="myText-info">$' + value['price'] + '</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-start mb-3 px-5">';
+				productInfo_html += '<div class="myTitle-info">商品描述</div>';
+				productInfo_html += '<div class="myText-info">' + value['content'] + '</div>';
+				productInfo_html += '</div>';
+				productInfo_html += '<div class="d-flex justify-content-start mb-3 px-5">';
+				productInfo_html += '<div class="myTitle-info">交易地點</div>';
+				productInfo_html += '<div class="myText-info">' + value['place'] + '</div>';
+				productInfo_html += '</div></div></div>';
+
+			})
+			// 重新append所有會員row
+			$("#main_view").append(productInfo_html);
+		}
+		
+		 
+		 //建立訂單
+        function newOrder() {
+
+
+	         // 將資料組成JSON格式(格式名稱參照文件)
+	         var data_object = {
+	         	"user_id" : user_id_string,
+	         	"product_id" : product_id,
+	         };
+	         
+	         console.log(data_object);
+
+	         // 將JSON格式轉換成字串
+	         var data_string = JSON.stringify(data_object);
+
+        // 發出POST的AJAX請求(未做)
+	         $.ajax({
+	             type: "POST",
+	             url: "api/order.do",
+	             data: data_string,
+	             crossDomain: true,
+	             cache: false,
+	             dataType: 'json',
+	             timeout: 5000,
+	             success: function (response) {
+	             	
+	                 if (response.status == 200) {
+	                 	alert("訂單建立成功!");
+	                 	document.location.href = "center-myOrder-browse.html";
+	                 }
+	             },
+	             error: function () {
+	                 alert("無法連線到伺服器！");
+	             }
+	         });      
+       }
+		 
+		 
+		
+		
+		//渲染時執行getAllMember()
+		$(document).ready(function () {
+		    getProductInfo(product_id);
+		});
+    </script>
+
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

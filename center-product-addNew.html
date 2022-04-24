@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Required meta tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="statics/scss/all.css">
+
+<!-- ajax -->
+<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+
+<title>復活Pro</title>
+</head>
+
+<body>
+	<!-- navBar -->
+	<script src="statics/js/meta_content/navBar_user.js"></script>
+
+    <!-- tabBar -->
+    <div class="bg-tabBar py-5">
+        <div class="d-flex justify-content-center mb-3 px-5">
+            <div class="row">
+                <div class="col">
+                    <form action="center-basicInfo-view.html">
+                        <button type="submit" class="btn-tabBar">基本資料</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <form action="center-myOrder-browse.html">
+                        <button type="submit" class="btn-tabBar">我的訂單</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <form action="center-product-browse.html">
+                        <button type="submit" class="btn-tabBar btn-tabBar-hover">商品管理</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <form action="login.html">
+                        <button type="submit" class="btn-tabBar">登出</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品資訊 -->
+    <div class="containter py-5 px-5 main_view">
+        <div class="d-flex justify-content-between mb-3 px-5">
+            <div class="myTitle-main">上架商品資訊填寫</div>
+        </div>
+        <!-- 表單form -->
+        <!-- 待修改:maxlength? 為什麼class 也需要reqired之類的-->
+        <form id="form" accept-charset="utf-8" class="needs-validation">
+            <!-- POST -->
+            <div style="display:none;"><input type="hidden" name="_method" value="POST"></div>
+            <!-- 顯示內容 -->
+            <div class="px-5 mb-3">
+                <label for="input_product_name" class="form-label">商品名稱</label>
+                <input class="form-control" name="name" type="text" id="input_product_name" placeholder="你的商品名稱" required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_product_type" class="form-label">商品類別
+                </label>
+                <select id="input_product_type" class="form-select" name="type" type="text" required>
+                    <option selected>選擇商品類別</option>
+                    <option value="教科書/參考書">教科書/參考書</option>
+                    <option value="課外書">課外書</option>
+                    <option value="服飾配件">服飾配件</option>
+                    <option value="美妝保養">美妝保養</option>
+                    <option value="生活用品">生活用品</option>
+                    <option value="電器用品">電器用品</option>
+                    <option value="飲食">飲食</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_price" class="form-label">商品價格</label>
+                <input class="form-control" name="price" type="number" id="input_price" placeholder="你的商品價格"
+                    required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_product_state" class="form-label">商品狀態</label>
+                <select id="input_product_state" class="form-select" name="state" type="text" required>
+                    <option selected>選擇商品狀態</option>
+                    <option value="全新">全新</option>
+                    <option value="近全新">近全新</option>
+                    <option value="7.5成新">7.5成新</option>
+                    <option value="5成新">5成新</option>
+                    <option value="3成新">3成新</option>
+                </select>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_content" class="form-label">商品描述</label>
+                <input class="form-control" name="name" type="content" id="input_content" placeholder="填寫商品描述"
+                    required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_place" class="form-label">交易地點</label>
+                <input class="form-control" name="place" type="text" id="input_place" placeholder="欲交易地點" required>
+            </div>
+            <div class="px-5 mb-5">
+                <label for="input_image" class="form-label">選擇商品照片</label>
+                <input class="form-control" name="picture" type="file" id="input_image" required>
+            </div>
+
+            <div class="submit d-flex justify-content-center">
+                <input class="btn-cool" type="submit" value="上架商品" id="submit">
+            </div>
+        </form>
+    </div>
+    
+    
+
+    <script type="text/javascript">
+    
+    
+   		var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+   		let user_id_string = user_id.toString();
+    
+        $(document).ready(function () {
+            // 處理表單點擊事件
+            var $form = $('#submit');
+            $form.click(function () {
+                submit();
+            });
+
+            function submit() {
+            	
+            	
+	            // 將前端表單填寫值存進變數
+	            var product_name = $('#input_product_name').val();
+	            var product_type = $('#input_product_type').val();
+	            var price = $('#input_price').val();
+	            var product_state = $('#input_product_state').val();
+	            var content = $('#input_content').val();
+	            var place = $('#input_place').val();
+	            var image = "statics/asset/img/textbool1.png";
+	
+	            // 格式設定(未做)
+	
+	            // 將資料組成JSON格式(格式名稱參照文件)
+	            var data_object = {
+	            	"user_id" : user_id_string,
+	            	"product_name" : product_name,
+	            	"product_type" : product_type,
+	            	"price" : price,
+	            	"product_state" : product_state,
+	            	"content" : content,
+	            	"place" : place,
+	            	"image" : image
+	            };
+	            
+	            console.log(data_object);
+	
+	            // 將JSON格式轉換成字串
+	            var data_string = JSON.stringify(data_object);
+	
+	            // 發出POST的AJAX請求(未做)
+	            $.ajax({
+	                type: "POST",
+	                url: "api/product.do",
+	                data: data_string,
+	                crossDomain: true,
+	                cache: false,
+	                dataType: 'json',
+	                timeout: 5000,
+	                success: function (response) {
+	                	
+	                    if (response.status == 200) {
+	                    	alert("上架成功!");
+	                    	document.location.href = "center-product-browse.html";
+	                    }
+	                },
+	                error: function () {
+	                    alert("無法連線到伺服器！");
+	                }
+	            });      
+            }
+        });
+    </script>
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

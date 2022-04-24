@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="statics/scss/all.css">
+    
+    <!-- ajax -->
+    <script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+
+    <title>復活Pro</title>
+</head>
+
+<body>
+	<!-- navBar_visitor -->
+    <nav class="navbar navbar-expand-lg bg-secondary px-5 d-flex justify-content-start">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html" data-bs-toggle="modal" data-bs-target="#input_dialog">
+                <img src="statics/img/logo.png" alt="logo.png" height="24">
+            </a>
+	        <ul class="navbar-nav">
+	            <form class="mx-3" action="register.html">
+	                <button type="link" class="btn btn-outline-primary">註冊</button>
+	            </form>
+	            <form action="login.html">
+	                <button type="link" class="btn btn-outline-primary">登入</button>
+	            </form>
+	        </ul>
+        </div>
+    </nav>
+
+    <!-- 彈跳式視窗 -->
+    <div class="modal fade" id="input_dialog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <center class="py-3">
+                        <img src="statics/asset/img/info.svg" alt="success.svg">
+                        <h5 class="mt-4">請先登入</h5>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 商品資訊 -->
+    <div class="containter py-5 px-5 main_view form-sm">
+        <div class="d-flex justify-content-between mb-3 px-5">
+            <div class="myTitle-main">註冊會員</div>
+        </div>
+        <!-- 表單form -->
+        <!-- 待修改:maxlength? 為什麼class 也需要reqired之類的-->
+        <form id="form" accept-charset="utf-8" class="needs-validation">
+            <!-- POST -->
+            <div style="display:none;"><input type="hidden" name="_method" value="POST"></div>
+            <!-- 顯示內容 -->
+            <div class="px-5 mb-3">
+                <label for="input_student_id" class="form-label">學號</label>
+                <input class="form-control" name="number" type="number" id="input_student_id" placeholder="學號" required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_name" class="form-label">姓名</label>
+                <input class="form-control" name="name" type="text" id="input_name" placeholder="姓名" required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_email" class="form-label">Email</label>
+                <input class="form-control" name="email" type="email" id="input_email" placeholder="信箱" required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_password" class="form-label">密碼</label>
+                <input class="form-control" name="password" type="password" id="input_password" placeholder="密碼"
+                    required>
+            </div>
+            <div class="px-5 mb-3">
+                <label for="input_phone_number" class="form-label">手機號碼</label>
+                <input class="form-control" name="number" type="number" id="input_phone_number" placeholder="手機號碼"
+                    required>
+            </div>
+            <div class="submit d-flex justify-content-center mt-5">
+                <input class="btn-cool" type="submit" value="註冊會員" id="submit">
+            </div>
+        </form>
+    </div>
+
+    <!-- footer -->
+    <script src="statics/js/meta_content/footer_user.js"></script>
+
+    <!-- Js -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // 處理表單點擊事件
+            var $form = $('#submit');
+            $form.click(function () {
+                submit();
+            });
+
+            function submit() {
+
+	            // 將前端表單填寫值存進變數
+	            var student_id = $('#input_student_id').val();
+	            var name = $('#input_name').val();
+	            var email = $('#input_email').val();
+	            var password = $('#input_password').val();
+	            var phone_number = $('#input_phone_number').val();
+	
+	            // 格式設定(未做)
+	            // 格式設定(未做)
+                var email_rule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+                var stu_id_rule = /^(?=.*[0-9])[0-9\d]{9,9}$/;
+                var user_phone_rule = /^(?=.*[0-9])[0-9\d]{10,10}$/;
+                
+                if (!email_rule.test(email)) {
+                    alert("Email格式不符！");
+                }
+                else if (!stu_id_rule.test(student_id)) {
+                    alert("學號由9位數字組成!");
+                }
+                else if (!user_phone_rule.test(phone_number)) {
+                    alert("請輸入10位電話");
+                } 
+                else {
+    	            // 將資料組成JSON格式(格式名稱參照文件)
+    	            var data_object = {
+    	                "user_name": name,
+    	                "stu_id": student_id,
+    	                "email": email,
+    	                "password": password,
+    	                "user_phone": phone_number
+    	            };
+    	
+    	            // 將JSON格式轉換成字串
+    	            var data_string = JSON.stringify(data_object);
+    	
+    	            // 發出POST的AJAX請求(未做)
+    	            $.ajax({
+    	                type: "POST",
+    	                url: "api/member.do",
+    	                data: data_string,
+    	                crossDomain: true,
+    	                cache: false,
+    	                dataType: 'json',
+    	                timeout: 5000,
+    	                success: function (response) {
+    	                   // $('#flashMessage').html(response.message);
+    	                    //$('#flashMessage').show();
+    	                    if (response.status == 200) {
+    	                    	alert("建立成功!")
+    	    					document.location.href = "login.html";
+    	                    }
+    	                },
+    	                error: function () {
+    	                    alert("無法連線到伺服器！");
+    	                }
+    	            }); 
+                	
+                }
+	
+     
+            }
+        });
+    </script>
+
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
